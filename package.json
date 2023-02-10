@@ -6,6 +6,11 @@
     "start": "next start"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.4.9",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "d3": "^7.8.2",
+    "framer-motion": "^9.0.1",
     "next": "latest",
     "react": "18.2.0",
     "react-dom": "18.2.0"

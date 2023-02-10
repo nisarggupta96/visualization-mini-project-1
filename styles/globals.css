@@ -36,3 +36,7 @@ button {
   padding: 0.5rem 1rem;
   font-weight: bold;
 }
+
+.tick text {
+  font-size: 18px;
+}
