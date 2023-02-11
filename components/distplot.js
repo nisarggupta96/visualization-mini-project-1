@@ -26,130 +26,228 @@ export const DistPlot = ({ data, countMap }) => {
 	const renderHistogram = (svg, selectedColumn) => {
 		const dataToRender = data;
 		const { min_val, max_val } = HIST_CONFIG[selectedColumn];
-		const x = d3.scaleLinear()
-			.domain([min_val, max_val])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
-			.range([0, 850]);
+		
+		if (isHorizontal) {
+			const y = d3.scaleLinear()
+				.domain([min_val, max_val])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+				.range([850, 0]);
 
-		svg.append("g")
-			.attr("transform", "translate(0," + DEFAULT_HEIGHT + ")")
-			.call(d3.axisBottom(x))
-			.selectAll("text")
-			.attr("transform", "translate(10,0) rotate(-45)")
-			.style("text-anchor", "end")
-			.style("font-size", "18px");
+			svg.append("g")
+				.call(d3.axisLeft(y))
+				.selectAll("text")
+				.style("text-anchor", "end")
+				.style("font-size", "18px");
 
-		// set the parameters for the histogram
-		const histogram = d3.histogram()
-			.value(function (d) { return d[selectedColumn]; })   // I need to give the vector of value
-			.domain(x.domain())  // then the domain of the graphic
-			.thresholds(x.ticks(numOfBins)); // then the numbers of bins
+			// set the parameters for the histogram
+			const histogram = d3.histogram()
+				.value(function (d) { return d[selectedColumn]; })   // I need to give the vector of value
+				.domain(y.domain())  // then the domain of the graphic
+				.thresholds(y.ticks(numOfBins)); // then the numbers of bins
 
-		// And apply this function to data to get the bins
-		const bins = histogram(dataToRender);
-		// Y axis: scale and draw:
-		const y = d3.scaleLinear()
-			.range([DEFAULT_HEIGHT, 0]);
+			// And apply this function to data to get the bins
+			const bins = histogram(dataToRender);
+			// X axis: scale and draw:
+			const x = d3.scaleLinear()
+				.range([DEFAULT_HEIGHT, 0])
+				.domain([d3.max(bins, function (d) { return d.length; }) + 50, 0]);   // d3.hist has to be called before the Y axis obviously
+			
+			svg.append("g")
+				.attr("transform", "translate(0," + 850 + ")")
+				.call(d3.axisBottom(x))
+				.selectAll("text")
+				.style("font-size", "18px");
 
-		y.domain([0, d3.max(bins, function (d) { return d.length; }) + 10]);   // d3.hist has to be called before the Y axis obviously
-		svg.append("g")
-			.call(d3.axisLeft(y))
-			.selectAll("text")
-			.style("font-size", "18px");
+			svg.append("text")
+				.attr("class", "x label")
+				.attr("text-anchor", "end")
+				.attr("x", DEFAULT_WIDTH / 2 - columnToShow.length)
+				.attr("y", 850+75)
+				.text("Frequency")
+				.style("font-size", "18px")
+				.style("font-weight", 600);
 
-		svg.append("text")
-			.attr("class", "x label")
-			.attr("text-anchor", "end")
-			.attr("x", DEFAULT_WIDTH / 2 - columnToShow.length)
-			.attr("y", DEFAULT_HEIGHT + 100)
-			.text(selectedColumn)
-			.style("font-size", "18px")
-			.style("font-weight", 600);
+			svg.append("text")
+				.attr("class", "y label")
+				.attr("text-anchor", "end")
+				.attr("y", -80)
+				.attr("x", -DEFAULT_HEIGHT / 2.5)
+				.attr("dy", ".75em")
+				.attr("transform", "rotate(-90)")
+				.text(selectedColumn)
+				.style("font-weight", 600)
+				.style("font-size", "18px");
 
-		svg.append("text")
-			.attr("class", "y label")
-			.attr("text-anchor", "end")
-			.attr("y", -80)
-			.attr("x", -DEFAULT_HEIGHT / 2.5)
-			.attr("dy", ".75em")
-			.attr("transform", "rotate(-90)")
-			.text("Frequency")
-			.style("font-weight", 600)
-			.style("font-size", "18px");
+			// append the bar rectangles to the svg element
+			svg.selectAll("rect")
+				.data(bins)
+				.enter()
+				.append("rect")
+					.attr("y", x(0))
+					.attr("transform", function (d) { return "translate(" + x(d.x0) + "," + x(d.length) + ")"; })
+					.style("fill", "#69b3a2")
+					.transition()
+					.duration(500)
+					.attr("height", function (d) { return y(d.x0) - y(d.x1) - 1; })
+					.attr("width", function (d) { return x(d.length); });
+		} else {
+			const x = d3.scaleLinear()
+				.domain([min_val, max_val])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+				.range([0, 850]);
 
-		// append the bar rectangles to the svg element
-		svg.selectAll("rect")
-			.data(bins)
-			.enter()
-			.append("rect")
-			.attr("x", 1)
-			.attr("transform", function (d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
-			.attr("width", 0)
-			.style("fill", "#69b3a2")
-			.transition()
-			.duration(500)
-			.attr("width", function (d) { return x(d.x1) - x(d.x0) - 1; })
-			.attr("height", function (d) { return DEFAULT_HEIGHT - y(d.length); })
+			svg.append("g")
+				.attr("transform", "translate(0," + DEFAULT_HEIGHT + ")")
+				.call(d3.axisBottom(x))
+				.selectAll("text")
+				.attr("transform", "translate(10,0) rotate(-45)")
+				.style("text-anchor", "end")
+				.style("font-size", "18px");
+
+			// set the parameters for the histogram
+			const histogram = d3.histogram()
+				.value(function (d) { return d[selectedColumn]; })   // I need to give the vector of value
+				.domain(x.domain())  // then the domain of the graphic
+				.thresholds(x.ticks(numOfBins)); // then the numbers of bins
+
+			// And apply this function to data to get the bins
+			const bins = histogram(dataToRender);
+			// Y axis: scale and draw:
+			const y = d3.scaleLinear()
+				.range([DEFAULT_HEIGHT, 0]);
+
+			y.domain([0, d3.max(bins, function (d) { return d.length; }) + 50]);   // d3.hist has to be called before the Y axis obviously
+			svg.append("g")
+				.call(d3.axisLeft(y))
+				.selectAll("text")
+				.style("font-size", "18px");
+
+			svg.append("text")
+				.attr("class", "x label")
+				.attr("text-anchor", "end")
+				.attr("x", DEFAULT_WIDTH / 2 - columnToShow.length)
+				.attr("y", DEFAULT_HEIGHT + 100)
+				.text(selectedColumn)
+				.style("font-size", "18px")
+				.style("font-weight", 600);
+
+			svg.append("text")
+				.attr("class", "y label")
+				.attr("text-anchor", "end")
+				.attr("y", -80)
+				.attr("x", -DEFAULT_HEIGHT / 2.5)
+				.attr("dy", ".75em")
+				.attr("transform", "rotate(-90)")
+				.text("Frequency")
+				.style("font-weight", 600)
+				.style("font-size", "18px");
+
+			// append the bar rectangles to the svg element
+			svg.selectAll("rect")
+				.data(bins)
+				.enter()
+				.append("rect")
+				.attr("x", 1)
+				.attr("transform", function (d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
+				.attr("width", 0)
+				.style("fill", "#69b3a2")
+				.transition()
+				.duration(500)
+				.attr("width", function (d) { return Math.max(0, x(d.x1) - x(d.x0) - 1); })
+				.attr("height", function (d) { return DEFAULT_HEIGHT - y(d.length); });
+		}
 	};
 
 	const renderDistribution = (svg, selectedColumn) => {
 		const dataToRender = Object.entries(countMap[selectedColumn]);
 		const maxValue = Math.max(...Object.values(countMap[selectedColumn]));
+		if (isHorizontal) {
+			var x = d3.scaleLinear()
+				.domain([0, maxValue])
+				.range([0, DEFAULT_WIDTH]);
+			svg.append("g")
+				.attr("transform", "translate(0," + DEFAULT_HEIGHT + ")")
+				.call(d3.axisBottom(x))
+				.selectAll("text")
+					.attr("transform", "translate(-10,0)rotate(-45)")
+					.style("text-anchor", "end");
 
-		const x = d3.scaleBand()
-			.range([0, 850])
-			.domain(dataToRender.map(function (d) { return d[0]; }))
-			.padding(0.2);
+			// Y axis
+			var y = d3.scaleBand()
+				.range([ 0, DEFAULT_HEIGHT ])
+				.domain(dataToRender.map(function(d) { return d[0]; }))
+				.padding(.1);
+			svg.append("g")
+				.call(d3.axisLeft(y))
 
-		svg.append("g")
-			.attr("transform", "translate(0," + DEFAULT_HEIGHT + ")")
-			.call(d3.axisBottom(x))
-			.selectAll("text")
-			.attr("transform", "translate(-10,0) rotate(-45)")
-			.style("text-anchor", "end")
-			.style("font-size", "18px");
+			//Bars
+			svg.selectAll("mybar")
+				.data(dataToRender)
+				.enter()
+				.append("rect")
+					.attr("x", x(0) )
+					.attr("y", function(d) { return y(d[0]); })
+					.attr("width", 0)
+					.transition()
+					.duration(500)
+					.attr("width", function(d) { return x(d[1]); })
+					.attr("height", y.bandwidth() )
+					.attr("fill", "#69b3a2")
+		} else {
+			const x = d3.scaleBand()
+				.range([0, 850])
+				.domain(dataToRender.map(function (d) { return d[0]; }))
+				.padding(0.2);
 
-		svg.append("text")
-			.attr("class", "x label")
-			.attr("text-anchor", "end")
-			.attr("x", DEFAULT_WIDTH / 2 - columnToShow.length)
-			.attr("y", DEFAULT_HEIGHT + 150)
-			.text(selectedColumn)
-			.style("font-size", "18px")
-			.style("font-weight", 600);
+			svg.append("g")
+				.attr("transform", "translate(0," + DEFAULT_HEIGHT + ")")
+				.call(d3.axisBottom(x))
+				.selectAll("text")
+					.attr("transform", "translate(-10,0) rotate(-45)")
+					.style("text-anchor", "end")
+					.style("font-size", "18px");
 
-		// Add Y axis
-		const y = d3.scaleLinear()
-			.domain([0, maxValue])
-			.range([DEFAULT_HEIGHT, 0]);
+			svg.append("text")
+				.attr("class", "x label")
+				.attr("text-anchor", "end")
+				.attr("x", DEFAULT_WIDTH / 2 - columnToShow.length)
+				.attr("y", DEFAULT_HEIGHT + 150)
+				.text(selectedColumn)
+				.style("font-size", "18px")
+				.style("font-weight", 600);
 
-		svg.append("g")
-			.call(d3.axisLeft(y))
-			.style("font-size", "18px");
+			// Add Y axis
+			const y = d3.scaleLinear()
+				.domain([0, maxValue])
+				.range([DEFAULT_HEIGHT, 0]);
 
-		svg.append("text")
-			.attr("class", "y label")
-			.attr("text-anchor", "end")
-			.attr("y", -80)
-			.attr("x", -DEFAULT_HEIGHT / 2.5)
-			.attr("dy", ".75em")
-			.attr("transform", "rotate(-90)")
-			.text("Frequency")
-			.style("font-weight", 600)
-			.style("font-size", "18px");
+			svg.append("g")
+				.call(d3.axisLeft(y))
+				.style("font-size", "18px");
 
-		// Bars
-		svg.selectAll("mybar")
-			.data(dataToRender)
-			.enter()
-			.append("rect")
-			.attr("x", function (d) { return x(d[0]); })
-			.attr("y", function (d) { return y(d[1]); })
-			.attr("width", 0)
-			.attr("fill", "#69b3a2")
-			.transition()
-			.duration(500)
-			.attr("width", x.bandwidth())
-			.attr("height", function (d) { return DEFAULT_HEIGHT - y(d[1]); })
+			svg.append("text")
+				.attr("class", "y label")
+				.attr("text-anchor", "end")
+				.attr("y", -80)
+				.attr("x", -DEFAULT_HEIGHT / 2.5)
+				.attr("dy", ".75em")
+				.attr("transform", "rotate(-90)")
+				.text("Frequency")
+				.style("font-weight", 600)
+				.style("font-size", "18px");
+
+			// Bars
+			svg.selectAll("mybar")
+				.data(dataToRender)
+				.enter()
+				.append("rect")
+					.attr("x", function (d) { return x(d[0]); })
+					.attr("y", function (d) { return y(d[1]); })
+					.attr("width", 0)
+					.attr("fill", "#69b3a2")
+					.transition()
+					.duration(500)
+					.attr("width", x.bandwidth())
+					.attr("height", function (d) { return DEFAULT_HEIGHT - y(d[1]); })
+		}
 	};
 
 	const renderChart = (selectedColumn) => {
@@ -159,16 +257,16 @@ export const DistPlot = ({ data, countMap }) => {
 
 		const svg = d3.select("#dist_plot")
 			.append("svg")
-			.attr("width", DEFAULT_WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
-			.attr("height", DEFAULT_HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
+				.attr("width", DEFAULT_WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
+				.attr("height", DEFAULT_HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
 			.append("g")
-			.attr("transform", "translate(" + MARGIN.LEFT + "," + MARGIN.TOP + ")");
+				.attr("transform", "translate(" + MARGIN.LEFT + "," + MARGIN.TOP + ")");
 
 		// X axis
-		if (COLUMN_MAPPING[selectedColumn] == COLUMN_TYPE.CATEGORICAL) {
-			renderDistribution(svg, selectedColumn);
-		} else {
+		if (COLUMN_MAPPING[selectedColumn] == COLUMN_TYPE.NUMERIC) {
 			renderHistogram(svg, selectedColumn);
+		} else {
+			renderDistribution(svg, selectedColumn);
 		}
 
 	}

@@ -13,41 +13,81 @@ export const ScatterPlot = ({ data, countMap }) => {
 		if (!columnX || !columnY) {
 			return;
 		}
-		const maxValueX = COLUMN_MAPPING[columnX] == COLUMN_TYPE.NUMERIC ? Math.max(...data.map(row => row[columnX])) : Object.keys(countMap[columnX]).length;
-		const maxValueY = COLUMN_MAPPING[columnY] == COLUMN_TYPE.NUMERIC ? Math.max(...data.map(row => row[columnY])) : Object.keys(countMap[columnY]).length;
+		const maxValueX = COLUMN_MAPPING[columnX].includes(COLUMN_TYPE.NUMERIC) ? d3.max(Object.keys(countMap[columnX]).map((d) => isNaN(d) ? d : Number(d))) : Object.keys(countMap[columnX]).length;;
+		const maxValueY = COLUMN_MAPPING[columnY].includes(COLUMN_TYPE.NUMERIC) ? d3.max(Object.keys(countMap[columnY]).map((d) => isNaN(d) ? d : Number(d))) : Object.keys(countMap[columnY]).length;;
 
 		var svg = d3.select("#scatter_plot")
 			.append("svg")
-			.attr("width", DEFAULT_WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
-			.attr("height", DEFAULT_HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
-			.append("g")
-			.attr("transform",
-				`translate(${MARGIN.LEFT},${MARGIN.TOP})`);
+				.attr("width", DEFAULT_WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
+				.attr("height", DEFAULT_HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
+				.append("g")
+					.attr("transform",
+						`translate(${MARGIN.LEFT},${MARGIN.TOP})`);
 
 		// X axis
-		var x = d3.scaleLinear()
-			.domain([0, maxValueX])
-			.range([0, 800]);
+		var x, y;
+		if (COLUMN_MAPPING[columnX] == COLUMN_TYPE.CATEGORICAL) {
+			x = d3.scaleBand()
+				.domain(data.map(d => d[columnX]))
+				.range([0, 850])
+				.padding(1);
+		} else {
+			x = d3.scaleLinear()
+				.domain([0, maxValueX])
+				.range([0, DEFAULT_WIDTH]);
+		}
+		
 		svg.append("g")
-			.attr("transform", `translate(0, ${800})`)
-			.call(d3.axisBottom(x));
+			.attr("transform", `translate(0, ${850})`)
+			.call(d3.axisBottom(x))
+			.selectAll("text")
+				.attr("transform", "translate(-10,0)rotate(-45)")
+				.style("text-anchor", "end");
+		
+		svg.append("text")
+			.attr("class", "x label")
+			.attr("text-anchor", "end")
+			.attr("x", DEFAULT_WIDTH/2 + columnX.length)
+			.attr("y", 900)
+			.text(columnX)
+			.style("font-size", "18px")
+			.style("font-weight", 600);
 
 		// Add Y axis
-		var y = d3.scaleLinear()
-			.domain([0, maxValueY])
-			.range([800, 0]);
+		if (COLUMN_MAPPING[columnY] == COLUMN_TYPE.CATEGORICAL) {
+			y = d3.scaleBand()
+				.domain(data.map(d => d[columnY]))
+				.range([0, 850])
+				.padding(1);
+		} else {
+			y = d3.scaleLinear()
+				.domain([0, maxValueY])
+				.range([850, 0]);
+		}
+		
 		svg.append("g")
 			.call(d3.axisLeft(y));
+		
+		svg.append("text")
+			.attr("class", "y label")
+			.attr("text-anchor", "end")
+			.attr("y", -80)
+			.attr("x", -DEFAULT_HEIGHT / 1.5 + columnY.length)
+			.attr("dy", ".75em")
+			.attr("transform", "rotate(-90)")
+			.text(columnY)
+			.style("font-weight", 600)
+			.style("font-size", "18px");
 
 		svg.append('g')
-			.selectAll("dot")
+			.selectAll("circle")
 			.data(data)
 			.enter()
-			.append("circle")
-			.attr("cx", function (d) { return x(d[columnX]); })
-			.attr("cy", function (d) { return y(d[columnY]); })
-			.attr("r", 5)
-			.style("fill", "#69b3a2")
+				.append("circle")
+				.attr("cx", function (d) { return x(d[columnX]); })
+				.attr("cy", function (d) { return y(d[columnY]); })
+				.attr("r", 5)
+				.style("fill", "#69b3a2")
 	};
 
 	useEffect(() => {

@@ -6,22 +6,24 @@ export const preprocessData = (rawData) => {
     const processedData = rawData.map((row) => {
         const processedRow = {}
         Object.entries(row).forEach(([key, val], _) => {
+            let updatedVal = val;
             if (COLUMN_MAPPING.hasOwnProperty(key)) {
                 switch (COLUMN_MAPPING[key]) {
                     case COLUMN_TYPE.NUMERIC: {
-                        processedRow[key] = Number(val || 0);
-                        break;
-                    }
-                    case COLUMN_TYPE.DATE: {
-                        processedRow[key] = new Date(val).getMonth()+1;
+                        if (key == "Release Date") {
+                            processedRow[key] = new Date(val).getMonth()+1;
+                            updatedVal = new Date(val).getMonth()+1;
+                        } else {
+                            processedRow[key] = Number(val || 0);
+                        }
                         break;
                     }
                     default: processedRow[key] = val;
                 }
-                if (!countMap[key].hasOwnProperty(val)) {
-                    countMap[key][val] = 0;
+                if (!countMap[key].hasOwnProperty(updatedVal)) {
+                    countMap[key][updatedVal] = 0;
                 }
-                countMap[key][val] += 1;
+                countMap[key][updatedVal] += 1;
             }
         });
         return processedRow;

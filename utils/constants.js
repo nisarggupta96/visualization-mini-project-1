@@ -1,25 +1,24 @@
 export const COLUMN_TYPE = {
     CATEGORICAL: 'CATEGORICAL',
     NUMERIC: 'NUMERIC',
-    DATE: 'DATE'
+    NUMERIC_II: 'NUMERIC_II'
 };
 
 export const COLUMN_MAPPING = {
-    // 'Carline': COLUMN_TYPE.CATEGORICAL,
     'Eng Displ': COLUMN_TYPE.NUMERIC,
-    '# Cyl': COLUMN_TYPE.CATEGORICAL,
+    '# Cyl': COLUMN_TYPE.NUMERIC_II,
     'Transmission': COLUMN_TYPE.CATEGORICAL,
     'City FE (Guide) - Conventional Fuel': COLUMN_TYPE.NUMERIC,
     'Hwy FE (Guide) - Conventional Fuel': COLUMN_TYPE.NUMERIC,
     'Air Aspiration Method Desc': COLUMN_TYPE.CATEGORICAL,
     'Trans Desc': COLUMN_TYPE.CATEGORICAL,
-    '# Gears': COLUMN_TYPE.CATEGORICAL,
+    '# Gears': COLUMN_TYPE.NUMERIC_II,
     'Drive Desc': COLUMN_TYPE.CATEGORICAL,
     'Annual Fuel Cost - Conventional Fuel': COLUMN_TYPE.NUMERIC,
-    'Intake Valves Per Cyl': COLUMN_TYPE.CATEGORICAL,
-    'Exhaust Valves Per Cyl': COLUMN_TYPE.CATEGORICAL,
+    'Intake Valves Per Cyl': COLUMN_TYPE.NUMERIC_II,
+    'Exhaust Valves Per Cyl': COLUMN_TYPE.NUMERIC_II,
     'Carline Class Desc': COLUMN_TYPE.CATEGORICAL,
-    'Release Date': COLUMN_TYPE.DATE,
+    'Release Date': COLUMN_TYPE.NUMERIC,
     'Stop/Start System (Engine Management System)  Description': COLUMN_TYPE.CATEGORICAL,
     'City CO2 Rounded Adjusted': COLUMN_TYPE.NUMERIC,
     'Hwy CO2 Rounded Adjusted': COLUMN_TYPE.NUMERIC
@@ -27,10 +26,10 @@ export const COLUMN_MAPPING = {
 
 export const DISTPLOT_CONFIG = {
     MARGIN: {
-        LEFT: 100,
-        RIGHT: 100,
+        LEFT: 200,
+        RIGHT: 200,
         TOP: 100,
-        BOTTOM: 500
+        BOTTOM: 700
     },
     DEFAULT_WIDTH: 850,
     DEFAULT_HEIGHT: 450,
