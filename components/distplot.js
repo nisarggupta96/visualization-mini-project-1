@@ -26,7 +26,7 @@ export const DistPlot = ({ data, countMap }) => {
 	const renderHistogram = (svg, selectedColumn) => {
 		const dataToRender = data;
 		const { min_val, max_val } = HIST_CONFIG[selectedColumn];
-		
+
 		if (isHorizontal) {
 			const y = d3.scaleLinear()
 				.domain([min_val, max_val])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
@@ -40,7 +40,7 @@ export const DistPlot = ({ data, countMap }) => {
 
 			// set the parameters for the histogram
 			const histogram = d3.histogram()
-				.value(function (d) { return d[selectedColumn]; })   // I need to give the vector of value
+				.value((d) => d[selectedColumn])   // I need to give the vector of value
 				.domain(y.domain())  // then the domain of the graphic
 				.thresholds(y.ticks(numOfBins)); // then the numbers of bins
 
@@ -49,8 +49,8 @@ export const DistPlot = ({ data, countMap }) => {
 			// X axis: scale and draw:
 			const x = d3.scaleLinear()
 				.range([DEFAULT_HEIGHT, 0])
-				.domain([d3.max(bins, function (d) { return d.length; }) + 50, 0]);   // d3.hist has to be called before the Y axis obviously
-			
+				.domain([d3.max(bins, (d) => d.length) + 50, 0]);   // d3.hist has to be called before the Y axis obviously
+
 			svg.append("g")
 				.attr("transform", "translate(0," + 850 + ")")
 				.call(d3.axisBottom(x))
@@ -61,7 +61,7 @@ export const DistPlot = ({ data, countMap }) => {
 				.attr("class", "x label")
 				.attr("text-anchor", "end")
 				.attr("x", DEFAULT_WIDTH / 2 - columnToShow.length)
-				.attr("y", 850+75)
+				.attr("y", 850 + 75)
 				.text("Frequency")
 				.style("font-size", "18px")
 				.style("font-weight", 600);
@@ -82,13 +82,13 @@ export const DistPlot = ({ data, countMap }) => {
 				.data(bins)
 				.enter()
 				.append("rect")
-					.attr("y", x(0))
-					.attr("transform", function (d) { return "translate(" + x(d.x0) + "," + x(d.length) + ")"; })
-					.style("fill", "#69b3a2")
-					.transition()
-					.duration(500)
-					.attr("height", function (d) { return y(d.x0) - y(d.x1) - 1; })
-					.attr("width", function (d) { return x(d.length); });
+				.attr("y", x(0))
+				.attr("transform", (d) => "translate(" + x(d.x0) + "," + x(d.length) + ")")
+				.style("fill", "#69b3a2")
+				.transition()
+				.duration(500)
+				.attr("height", (d) => y(d.x0) - y(d.x1) - 1)
+				.attr("width", (d) => x(d.length));
 		} else {
 			const x = d3.scaleLinear()
 				.domain([min_val, max_val])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
@@ -104,7 +104,7 @@ export const DistPlot = ({ data, countMap }) => {
 
 			// set the parameters for the histogram
 			const histogram = d3.histogram()
-				.value(function (d) { return d[selectedColumn]; })   // I need to give the vector of value
+				.value((d) => d[selectedColumn])   // I need to give the vector of value
 				.domain(x.domain())  // then the domain of the graphic
 				.thresholds(x.ticks(numOfBins)); // then the numbers of bins
 
@@ -114,7 +114,7 @@ export const DistPlot = ({ data, countMap }) => {
 			const y = d3.scaleLinear()
 				.range([DEFAULT_HEIGHT, 0]);
 
-			y.domain([0, d3.max(bins, function (d) { return d.length; }) + 50]);   // d3.hist has to be called before the Y axis obviously
+			y.domain([0, d3.max(bins, (d) => d.length) + 50]);   // d3.hist has to be called before the Y axis obviously
 			svg.append("g")
 				.call(d3.axisLeft(y))
 				.selectAll("text")
@@ -146,13 +146,13 @@ export const DistPlot = ({ data, countMap }) => {
 				.enter()
 				.append("rect")
 				.attr("x", 1)
-				.attr("transform", function (d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
+				.attr("transform", (d) => "translate(" + x(d.x0) + "," + y(d.length) + ")")
 				.attr("width", 0)
 				.style("fill", "#69b3a2")
 				.transition()
 				.duration(500)
-				.attr("width", function (d) { return Math.max(0, x(d.x1) - x(d.x0) - 1); })
-				.attr("height", function (d) { return DEFAULT_HEIGHT - y(d.length); });
+				.attr("width", (d) => Math.max(0, x(d.x1) - x(d.x0) - 1))
+				.attr("height", (d) => DEFAULT_HEIGHT - y(d.length));
 		}
 	};
 
@@ -167,13 +167,13 @@ export const DistPlot = ({ data, countMap }) => {
 				.attr("transform", "translate(0," + DEFAULT_HEIGHT + ")")
 				.call(d3.axisBottom(x))
 				.selectAll("text")
-					.attr("transform", "translate(-10,0)rotate(-45)")
-					.style("text-anchor", "end");
+				.attr("transform", "translate(-10,0)rotate(-45)")
+				.style("text-anchor", "end");
 
 			// Y axis
 			var y = d3.scaleBand()
-				.range([ 0, DEFAULT_HEIGHT ])
-				.domain(dataToRender.map(function(d) { return d[0]; }))
+				.range([0, DEFAULT_HEIGHT])
+				.domain(dataToRender.map((d) => d[0]))
 				.padding(.1);
 			svg.append("g")
 				.call(d3.axisLeft(y))
@@ -183,27 +183,27 @@ export const DistPlot = ({ data, countMap }) => {
 				.data(dataToRender)
 				.enter()
 				.append("rect")
-					.attr("x", x(0) )
-					.attr("y", function(d) { return y(d[0]); })
-					.attr("width", 0)
-					.transition()
-					.duration(500)
-					.attr("width", function(d) { return x(d[1]); })
-					.attr("height", y.bandwidth() )
-					.attr("fill", "#69b3a2")
+				.attr("x", x(0))
+				.attr("y", (d) => y(d[0]))
+				.attr("width", 0)
+				.transition()
+				.duration(500)
+				.attr("width", (d) => x(d[1]))
+				.attr("height", y.bandwidth())
+				.attr("fill", "#69b3a2")
 		} else {
 			const x = d3.scaleBand()
 				.range([0, 850])
-				.domain(dataToRender.map(function (d) { return d[0]; }))
+				.domain(dataToRender.map((d) => d[0]))
 				.padding(0.2);
 
 			svg.append("g")
 				.attr("transform", "translate(0," + DEFAULT_HEIGHT + ")")
 				.call(d3.axisBottom(x))
 				.selectAll("text")
-					.attr("transform", "translate(-10,0) rotate(-45)")
-					.style("text-anchor", "end")
-					.style("font-size", "18px");
+				.attr("transform", "translate(-10,0) rotate(-45)")
+				.style("text-anchor", "end")
+				.style("font-size", "18px");
 
 			svg.append("text")
 				.attr("class", "x label")
@@ -239,14 +239,14 @@ export const DistPlot = ({ data, countMap }) => {
 				.data(dataToRender)
 				.enter()
 				.append("rect")
-					.attr("x", function (d) { return x(d[0]); })
-					.attr("y", function (d) { return y(d[1]); })
-					.attr("width", 0)
-					.attr("fill", "#69b3a2")
-					.transition()
-					.duration(500)
-					.attr("width", x.bandwidth())
-					.attr("height", function (d) { return DEFAULT_HEIGHT - y(d[1]); })
+				.attr("x", (d) => x(d[0]))
+				.attr("y", (d) => y(d[1]))
+				.attr("width", 0)
+				.attr("fill", "#69b3a2")
+				.transition()
+				.duration(500)
+				.attr("width", x.bandwidth())
+				.attr("height", (d) => DEFAULT_HEIGHT - y(d[1]))
 		}
 	};
 
@@ -257,10 +257,10 @@ export const DistPlot = ({ data, countMap }) => {
 
 		const svg = d3.select("#dist_plot")
 			.append("svg")
-				.attr("width", DEFAULT_WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
-				.attr("height", DEFAULT_HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
+			.attr("width", DEFAULT_WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
+			.attr("height", DEFAULT_HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
 			.append("g")
-				.attr("transform", "translate(" + MARGIN.LEFT + "," + MARGIN.TOP + ")");
+			.attr("transform", "translate(" + MARGIN.LEFT + "," + MARGIN.TOP + ")");
 
 		// X axis
 		if (COLUMN_MAPPING[selectedColumn] == COLUMN_TYPE.NUMERIC) {
@@ -305,7 +305,7 @@ export const DistPlot = ({ data, countMap }) => {
 				<Select width={"80%"} id='toggle-col' variant='filled' placeholder='Select column' onChange={(col) => setColumnToShow(col.target.value)}>
 					{Object.keys(COLUMN_MAPPING).map((opt, ind) => <option key={ind} value={opt}>{opt}</option>)}
 				</Select>
-				<FormLabel ml={"auto"} htmlFor='toggle-axis' mb='0'>
+				<FormLabel ml="10px" htmlFor='toggle-axis' mb='0'>
 					Toggle Orientation
 				</FormLabel>
 				<Switch colorScheme='teal' size='lg' id='toggle-axis' value={isHorizontal} onChange={(e) => setIsHorizontal(e.target.checked)} />
