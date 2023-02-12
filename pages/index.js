@@ -21,11 +21,11 @@ export default function Home({ data, countMap }) {
 			<main>
 				<Box margin='2' padding='2' color='black'>
 					<Center><Heading size={"sm"}>Data Visualization</Heading></Center>
-					<Divider mt="5"/>
-					<Tabs>
+					<Divider mt="5" />
+					<Tabs isFitted variant='soft-rounded'>
 						<TabList>
-							<Tab width={"50%"}>Distribution Plot / Histogram</Tab>
-							<Tab width={"50%"}>Scatter Plot</Tab>
+							<Tab>Distribution Plot / Histogram</Tab>
+							<Tab>Scatter Plot</Tab>
 						</TabList>
 						<TabPanels>
 							<TabPanel>

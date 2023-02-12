@@ -135,7 +135,7 @@ export const ScatterPlot = ({ data, countMap }) => {
 						</Select>
 					</PopoverBody>
 					<Divider />
-					<PopoverHeader fontWeight='semibold'>Attribute to size the points :</PopoverHeader>
+					<PopoverHeader fontWeight='semibold'>Attribute to size the points:</PopoverHeader>
 					<PopoverBody>
 						<Select variant='outline' value={sizeByCol} onChange={(col) => selectSizeByCol(col.target.value)}>
 							<option value={""}>None</option>

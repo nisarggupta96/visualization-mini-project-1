@@ -29,8 +29,8 @@ export const DistPlot = ({ data, countMap }) => {
 
 		if (isHorizontal) {
 			const y = d3.scaleLinear()
-				.domain([min_val, max_val])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
-				.range([850, 0]);
+				.range([DEFAULT_HEIGHT, 0])
+				.domain([min_val, max_val])  // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
 
 			svg.append("g")
 				.call(d3.axisLeft(y))
@@ -48,11 +48,11 @@ export const DistPlot = ({ data, countMap }) => {
 			const bins = histogram(dataToRender);
 			// X axis: scale and draw:
 			const x = d3.scaleLinear()
-				.range([DEFAULT_HEIGHT, 0])
+				.range([DEFAULT_WIDTH, 0])
 				.domain([d3.max(bins, (d) => d.length) + 50, 0]);   // d3.hist has to be called before the Y axis obviously
 
 			svg.append("g")
-				.attr("transform", "translate(0," + 850 + ")")
+				.attr("transform", "translate(0," + DEFAULT_HEIGHT + ")")
 				.call(d3.axisBottom(x))
 				.selectAll("text")
 				.style("font-size", "18px");
@@ -61,7 +61,7 @@ export const DistPlot = ({ data, countMap }) => {
 				.attr("class", "x label")
 				.attr("text-anchor", "end")
 				.attr("x", DEFAULT_WIDTH / 2 - columnToShow.length)
-				.attr("y", 850 + 75)
+				.attr("y", DEFAULT_HEIGHT + 100)
 				.text("Frequency")
 				.style("font-size", "18px")
 				.style("font-weight", 600);
@@ -69,10 +69,8 @@ export const DistPlot = ({ data, countMap }) => {
 			svg.append("text")
 				.attr("class", "y label")
 				.attr("text-anchor", "end")
-				.attr("y", -80)
-				.attr("x", -DEFAULT_HEIGHT / 2.5)
-				.attr("dy", ".75em")
-				.attr("transform", "rotate(-90)")
+				.attr("x", "50")
+				.attr("y", "-2em")
 				.text(selectedColumn)
 				.style("font-weight", 600)
 				.style("font-size", "18px");
@@ -82,13 +80,16 @@ export const DistPlot = ({ data, countMap }) => {
 				.data(bins)
 				.enter()
 				.append("rect")
-				.attr("y", x(0))
-				.attr("transform", (d) => "translate(" + x(d.x0) + "," + x(d.length) + ")")
+				.attr("x", 0.5)
+				.attr("y", (d) => y(d.x1) + 2)
+				.attr("transform", (d) => `translate(2em, ${x(d.x0)})`)
 				.style("fill", "#69b3a2")
+				.style("border", "1px solid black")
 				.transition()
 				.duration(500)
-				.attr("height", (d) => y(d.x0) - y(d.x1) - 1)
+				.attr("height", (d) => y(d.x0) - y(d.x1) - 5)
 				.attr("width", (d) => x(d.length));
+
 		} else {
 			const x = d3.scaleLinear()
 				.domain([min_val, max_val])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
@@ -166,9 +167,19 @@ export const DistPlot = ({ data, countMap }) => {
 			svg.append("g")
 				.attr("transform", "translate(0," + DEFAULT_HEIGHT + ")")
 				.call(d3.axisBottom(x))
+				.style("font-size", "18px")
 				.selectAll("text")
-				.attr("transform", "translate(-10,0)rotate(-45)")
+				.attr("transform", "translate(10,0)")
 				.style("text-anchor", "end");
+
+			svg.append("text")
+				.attr("class", "x label")
+				.attr("text-anchor", "end")
+				.attr("x", DEFAULT_WIDTH / 2 - columnToShow.length)
+				.attr("y", DEFAULT_HEIGHT + 100)
+				.text("Frequency")
+				.style("font-size", "18px")
+				.style("font-weight", 600);
 
 			// Y axis
 			var y = d3.scaleBand()
@@ -177,6 +188,16 @@ export const DistPlot = ({ data, countMap }) => {
 				.padding(.1);
 			svg.append("g")
 				.call(d3.axisLeft(y))
+				.style("font-size", "18px");
+
+			svg.append("text")
+				.attr("class", "y label")
+				.attr("text-anchor", "end")
+				.attr("x", "50")
+				.attr("y", "-2em")
+				.text(selectedColumn)
+				.style("font-weight", 600)
+				.style("font-size", "18px");
 
 			//Bars
 			svg.selectAll("mybar")
@@ -205,11 +226,16 @@ export const DistPlot = ({ data, countMap }) => {
 				.style("text-anchor", "end")
 				.style("font-size", "18px");
 
+			let defaultOffset = 150;
+			if (["Carline Class Desc"].includes(columnToShow)) {
+				defaultOffset = 300;
+			}
 			svg.append("text")
 				.attr("class", "x label")
 				.attr("text-anchor", "end")
-				.attr("x", DEFAULT_WIDTH / 2 - columnToShow.length)
-				.attr("y", DEFAULT_HEIGHT + 150)
+				.attr("x", DEFAULT_WIDTH)
+				.attr("transform", `translate(-${DEFAULT_WIDTH / 4 - columnToShow.length * 2})`)
+				.attr("y", DEFAULT_HEIGHT + defaultOffset)
 				.text(selectedColumn)
 				.style("font-size", "18px")
 				.style("font-weight", 600);
@@ -255,12 +281,17 @@ export const DistPlot = ({ data, countMap }) => {
 			return;
 		}
 
+		let leftMargin = MARGIN.LEFT;
+		if (isHorizontal && ["Carline Class Desc", "Air Aspiration Method Desc"].includes(columnToShow)) {
+			leftMargin = 400;
+		}
+
 		const svg = d3.select("#dist_plot")
 			.append("svg")
 			.attr("width", DEFAULT_WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
 			.attr("height", DEFAULT_HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
 			.append("g")
-			.attr("transform", "translate(" + MARGIN.LEFT + "," + MARGIN.TOP + ")");
+			.attr("transform", "translate(" + leftMargin + "," + MARGIN.TOP + ")");
 
 		// X axis
 		if (COLUMN_MAPPING[selectedColumn] == COLUMN_TYPE.NUMERIC) {
@@ -301,11 +332,11 @@ export const DistPlot = ({ data, countMap }) => {
 
 	return <Box>
 		<HStack>
-			<FormControl display='flex' alignItems='center'>
+			<FormControl display={"flex"} alignItems='center' justifyContent="space-between">
 				<Select width={"80%"} id='toggle-col' variant='filled' placeholder='Select column' onChange={(col) => setColumnToShow(col.target.value)}>
 					{Object.keys(COLUMN_MAPPING).map((opt, ind) => <option key={ind} value={opt}>{opt}</option>)}
 				</Select>
-				<FormLabel ml="10px" htmlFor='toggle-axis' mb='0'>
+				<FormLabel marginLeft={"auto"} htmlFor='toggle-axis' mb='0'>
 					Toggle Orientation
 				</FormLabel>
 				<Switch colorScheme='teal' size='lg' id='toggle-axis' value={isHorizontal} onChange={(e) => setIsHorizontal(e.target.checked)} />
