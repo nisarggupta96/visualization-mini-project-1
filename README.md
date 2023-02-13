@@ -14,3 +14,10 @@ This 2023 car manufacturing dataset features columns that provide in-depth infor
 ### Capabilities
 - Plot the distribution/histogram plots for the selected attribute
 - Plot scatter plots for user-selected features for X and Y axis
+
+
+### Steps to run
+- Requires Node.js installed with npm
+- Clone the repo and run `npm install` from terminal
+- To start the server, run `npm run dev` from terminal
+- Open localhost:3000 on local browser

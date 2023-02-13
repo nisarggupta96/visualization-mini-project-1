@@ -144,14 +144,18 @@ export const ScatterPlot = ({ data, countMap }) => {
 			.data(data)
 			.enter()
 			.append("circle")
-				.attr("cx", (d) => x(d[columnX]))
+				.on("mouseover", (e, d) => mouseover(e))
+				.on("mousemove", (e, d) => mousemove(e, d[columnX], d[columnY], groupByCol && d[groupByCol], sizeByCol && countMap[sizeByCol][d[sizeByCol]]))
+				.on("mouseleave", (e, d) => mouseleave(e))
+				.attr("cx", 0)
 				.attr("cy", (d) => y(d[columnY]))
 				.attr("r", (d) => sizeByCol ? getSize(countMap[sizeByCol][d[sizeByCol]]) : 5)
 				.style("opacity", 0.8)
 				.style("fill", (d) => groupByCol ? getColor(d[groupByCol]) : DEFAULT_COLOR)
-				.on("mouseover", (e, d) => mouseover(e))
-				.on("mousemove", (e, d) => mousemove(e, d[columnX], d[columnY], groupByCol && d[groupByCol], sizeByCol && countMap[sizeByCol][d[sizeByCol]]))
-				.on("mouseleave", (e, d) => mouseleave(e))
+				.transition()
+				.duration(1000)
+				.attr("cx", (d) => x(d[columnX]))
+				
 	};
 
 	useEffect(() => {
