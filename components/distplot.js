@@ -12,7 +12,10 @@ import {
 	PopoverHeader,
 	PopoverCloseButton,
 	PopoverBody,
-	Badge
+	Badge,
+	Heading,
+	Center,
+	Text
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import * as d3 from 'd3';
@@ -163,7 +166,7 @@ export const DistPlot = ({ data, countMap }) => {
 			svg.append("text")
 				.attr("class", "x label")
 				.attr("text-anchor", "end")
-				.attr("x", DEFAULT_WIDTH / 2 - columnToShow.length)
+				.attr("x", "50%")
 				.attr("y", DEFAULT_HEIGHT + 100)
 				.text(selectedColumn)
 				.style("font-size", "18px")
@@ -226,8 +229,8 @@ export const DistPlot = ({ data, countMap }) => {
 		var mousemove = function (event, val) {
 			Tooltip
 				.html(`Value: ${val}`)
-				.style("left", `${event.offsetX}px`)
-				.style("top", `${event.offsetY-100}px`)
+				.style("left", `${event.offsetX+10}px`)
+				.style("top", `${event.offsetY-10}px`)
 		}
 		var mouseleave = function (event, d) {
 			Tooltip
@@ -314,7 +317,7 @@ export const DistPlot = ({ data, countMap }) => {
 			svg.append("text")
 				.attr("class", "x label")
 				.attr("text-anchor", "end")
-				.attr("x", DEFAULT_WIDTH)
+				.attr("x", "50%")
 				.attr("transform", `translate(-${DEFAULT_WIDTH / 4 - columnToShow.length * 2})`)
 				.attr("y", DEFAULT_HEIGHT + defaultOffset)
 				.text(selectedColumn)
@@ -405,6 +408,7 @@ export const DistPlot = ({ data, countMap }) => {
 			</FormControl>
 		</HStack>
 		<Box padding={2} className="wrapper">
+			{columnToShow &&<Center><Heading mt={"10px"} size={"md"}>Distribution plot for: <Text color={"red"} as='samp'>{columnToShow}</Text></Heading></Center>}
 			<div id="dist_plot" />
 			{columnToShow && (
 				<div className="legend-container">

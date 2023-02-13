@@ -6,7 +6,6 @@ import { DistPlot } from '../components/distplot';
 import { ScatterPlot } from '../components/scatterplot';
 
 export default function Home({ data, countMap }) {
-
 	return (
 		<div>
 			<Head>

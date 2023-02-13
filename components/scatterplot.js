@@ -1,4 +1,4 @@
-import { Badge, Box, Button, Divider, HStack, Popover, PopoverBody, PopoverContent, PopoverHeader, PopoverTrigger, Radio, RadioGroup, Select } from "@chakra-ui/react";
+import { Badge, Box, Button, Center, Divider, Heading, HStack, Popover, PopoverBody, PopoverContent, PopoverHeader, PopoverTrigger, Radio, RadioGroup, Select, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import * as d3 from 'd3';
 import { COLUMN_MAPPING, COLUMN_TYPE, DEFAULT_COLOR, DISTPLOT_CONFIG, LEGEND_CONFIG } from "../utils/constants";
@@ -162,7 +162,7 @@ export const ScatterPlot = ({ data, countMap }) => {
 				<Radio colorScheme='green' size={"lg"} value='Y'>Y Axis</Radio>
 			</RadioGroup>
 			{axis == "X" && (
-				<Select variant='outline' defaultValue={columnX} onChange={(col) => setColumnX(col.target.value)}>
+				<Select variant='outline' defaultValue={columnX} placeholder='Select column X' onChange={(col) => setColumnX(col.target.value)}>
 					{Object.keys(COLUMN_MAPPING).map((opt, ind) => <option key={ind} value={opt}>{opt}</option>)}
 				</Select>
 			)}
@@ -195,6 +195,7 @@ export const ScatterPlot = ({ data, countMap }) => {
 			</Popover>
 		</HStack>
 		<Box padding={2} className="wrapper">
+			{columnX && columnY &&<Center><Heading mt={"10px"} size={"md"}>Scatter plot for: <Text as='samp' color={"red"}>{columnY}</Text> against <Text as='samp' color={"red"}>{columnX}</Text></Heading></Center>}
 			<div id="scatter_plot" />
 			{columnX && columnY && (
 				<div className="legend-container">

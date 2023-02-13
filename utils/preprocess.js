@@ -18,7 +18,7 @@ export const preprocessData = (rawData) => {
                         }
                         break;
                     }
-                    default: processedRow[key] = val;
+                    default: processedRow[key] = updatedVal;
                 }
                 if (!countMap[key].hasOwnProperty(updatedVal)) {
                     countMap[key][updatedVal] = 0;
