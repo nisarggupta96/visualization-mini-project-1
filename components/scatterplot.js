@@ -85,10 +85,11 @@ export const ScatterPlot = ({ data, countMap }) => {
 				.range([0, DEFAULT_WIDTH]);
 		}
 
-		svg.append("g")
+		const xAxis = svg.append("g")
 			.attr("transform", `translate(0, ${850})`)
-			.call(d3.axisBottom(x))
-			.selectAll("text")
+			.call(d3.axisBottom(x).tickSize(-850).ticks());
+		xAxis.select(".domain").remove();
+		xAxis.selectAll("text")
 				.attr("transform", "translate(-10,0)rotate(-45)")
 				.style("text-anchor", "end")
 				.style("font-size", "18px");
@@ -114,9 +115,12 @@ export const ScatterPlot = ({ data, countMap }) => {
 				.range([850, 0]);
 		}
 
-		svg.append("g")
-			.call(d3.axisLeft(y))
-			.style("font-size", "18px");
+		const yAxis = svg.append("g")
+			.call(d3.axisLeft(y).tickSize(-DEFAULT_WIDTH).ticks());
+		yAxis.select(".domain").remove();
+		yAxis.style("font-size", "18px");
+
+		svg.selectAll(".tick line").attr("stroke", "#EBEBEB")
 
 		svg.append("text")
 			.attr("class", "y label")
