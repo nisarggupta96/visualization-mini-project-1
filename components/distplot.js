@@ -1,20 +1,22 @@
 import {
 	Box,
 	Select,
-	Slider,
-	SliderTrack,
-	SliderFilledTrack,
-	SliderThumb,
-	SliderMark,
-	VStack,
 	Switch,
 	HStack,
 	FormControl,
-	FormLabel
+	FormLabel,
+	Popover,
+	PopoverTrigger,
+	Button,
+	PopoverContent,
+	PopoverHeader,
+	PopoverCloseButton,
+	PopoverBody,
+	Badge
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import * as d3 from 'd3';
-import { COLUMN_MAPPING, COLUMN_TYPE, DISTPLOT_CONFIG, HIST_CONFIG } from "../utils/constants";
+import { COLUMN_MAPPING, COLUMN_TYPE, DEFAULT_COLOR, DISTPLOT_CONFIG, HIST_CONFIG, LEGEND_CONFIG } from "../utils/constants";
 
 export const DistPlot = ({ data, countMap }) => {
 	const [columnToShow, setColumnToShow] = useState("");
@@ -26,6 +28,39 @@ export const DistPlot = ({ data, countMap }) => {
 	const renderHistogram = (svg, selectedColumn) => {
 		const dataToRender = data;
 		const { min_val, max_val } = HIST_CONFIG[selectedColumn];
+
+		var Tooltip = d3.select("#dist_plot")
+			.append("div")
+			.style("opacity", 0)
+			.attr("class", "tooltip")
+			.style("background-color", "white")
+			.style("position", "absolute")
+			.style("border", "solid")
+			.style("border-width", "2px")
+			.style("border-radius", "5px")
+			.style("padding", "5px")
+
+		// Three function that change the tooltip when user hover / move / leave a cell
+		var mouseover = function (event, d) {
+			Tooltip
+				.style("opacity", 1)
+			d3.select(event.target)
+				.style("stroke", "black")
+				.style("opacity", 1)
+		}
+		var mousemove = function (event, val) {
+			Tooltip
+				.html(`Value: ${val}`)
+				.style("left", `${event.offsetX}px`)
+				.style("top", `${event.offsetY-70}px`)
+		}
+		var mouseleave = function (event, d) {
+			Tooltip
+				.style("opacity", 0)
+			d3.select(event.target)
+				.style("stroke", "none")
+				.style("opacity", 0.7)
+		}
 
 		if (isHorizontal) {
 			const y = d3.scaleLinear()
@@ -83,8 +118,12 @@ export const DistPlot = ({ data, countMap }) => {
 				.attr("x", 0.5)
 				.attr("y", (d) => y(d.x1) + 2)
 				.attr("transform", (d) => `translate(2em, ${x(d.x0)})`)
-				.style("fill", "#69b3a2")
+				.style("fill", DEFAULT_COLOR)
 				.style("border", "1px solid black")
+				.style("opacity", 0.7)
+				.on("mouseover", (e, d) => mouseover(e, d.length))
+				.on("mousemove", (e, d) => mousemove(e, d.length))
+				.on("mouseleave", (e, d) => mouseleave(e, d.length))
 				.transition()
 				.duration(500)
 				.attr("height", (d) => y(d.x0) - y(d.x1) - 5)
@@ -149,7 +188,11 @@ export const DistPlot = ({ data, countMap }) => {
 				.attr("x", 1)
 				.attr("transform", (d) => "translate(" + x(d.x0) + "," + y(d.length) + ")")
 				.attr("width", 0)
-				.style("fill", "#69b3a2")
+				.style("fill", DEFAULT_COLOR)
+				.style("opacity", 0.7)
+				.on("mouseover", (e, d) => mouseover(e, d.length))
+				.on("mousemove", (e, d) => mousemove(e, d.length))
+				.on("mouseleave", (e, d) => mouseleave(e, d.length))
 				.transition()
 				.duration(500)
 				.attr("width", (d) => Math.max(0, x(d.x1) - x(d.x0) - 1))
@@ -160,6 +203,40 @@ export const DistPlot = ({ data, countMap }) => {
 	const renderDistribution = (svg, selectedColumn) => {
 		const dataToRender = Object.entries(countMap[selectedColumn]);
 		const maxValue = Math.max(...Object.values(countMap[selectedColumn]));
+
+		var Tooltip = d3.select("#dist_plot")
+			.append("div")
+			.style("opacity", 0)
+			.attr("class", "tooltip")
+			.style("background-color", "white")
+			.style("position", "absolute")
+			.style("border", "solid")
+			.style("border-width", "2px")
+			.style("border-radius", "5px")
+			.style("padding", "5px")
+
+		// Three function that change the tooltip when user hover / move / leave a cell
+		var mouseover = function (event, d) {
+			Tooltip
+				.style("opacity", 1)
+			d3.select(event.target)
+				.style("stroke", "black")
+				.style("opacity", 1)
+		}
+		var mousemove = function (event, val) {
+			Tooltip
+				.html(`Value: ${val}`)
+				.style("left", `${event.offsetX}px`)
+				.style("top", `${event.offsetY-100}px`)
+		}
+		var mouseleave = function (event, d) {
+			Tooltip
+				.style("opacity", 0)
+			d3.select(event.target)
+				.style("stroke", "none")
+				.style("opacity", 0.7)
+		}
+
 		if (isHorizontal) {
 			var x = d3.scaleLinear()
 				.domain([0, maxValue])
@@ -193,7 +270,7 @@ export const DistPlot = ({ data, countMap }) => {
 			svg.append("text")
 				.attr("class", "y label")
 				.attr("text-anchor", "end")
-				.attr("x", "50")
+				.attr("x", selectedColumn.length + 100)
 				.attr("y", "-2em")
 				.text(selectedColumn)
 				.style("font-weight", 600)
@@ -206,12 +283,16 @@ export const DistPlot = ({ data, countMap }) => {
 				.append("rect")
 				.attr("x", x(0))
 				.attr("y", (d) => y(d[0]))
+				.style("opacity", 0.7)
+				.on("mouseover", (e, d) => mouseover(e, d[1]))
+				.on("mousemove", (e, d) => mousemove(e, d[1]))
+				.on("mouseleave", (e, d) => mouseleave(e, d[1]))
 				.attr("width", 0)
 				.transition()
 				.duration(500)
 				.attr("width", (d) => x(d[1]))
 				.attr("height", y.bandwidth())
-				.attr("fill", "#69b3a2")
+				.attr("fill", DEFAULT_COLOR)
 		} else {
 			const x = d3.scaleBand()
 				.range([0, 850])
@@ -227,7 +308,7 @@ export const DistPlot = ({ data, countMap }) => {
 				.style("font-size", "18px");
 
 			let defaultOffset = 150;
-			if (["Carline Class Desc"].includes(columnToShow)) {
+			if (["Carline Class"].includes(columnToShow)) {
 				defaultOffset = 300;
 			}
 			svg.append("text")
@@ -268,7 +349,11 @@ export const DistPlot = ({ data, countMap }) => {
 				.attr("x", (d) => x(d[0]))
 				.attr("y", (d) => y(d[1]))
 				.attr("width", 0)
-				.attr("fill", "#69b3a2")
+				.attr("fill", DEFAULT_COLOR)
+				.style("opacity", 0.7)
+				.on("mouseover", (e, d) => mouseover(e, d[1]))
+				.on("mousemove", (e, d) => mousemove(e, d[1]))
+				.on("mouseleave", (e, d) => mouseleave(e, d[1]))
 				.transition()
 				.duration(500)
 				.attr("width", x.bandwidth())
@@ -282,7 +367,7 @@ export const DistPlot = ({ data, countMap }) => {
 		}
 
 		let leftMargin = MARGIN.LEFT;
-		if (isHorizontal && ["Carline Class Desc", "Air Aspiration Method Desc"].includes(columnToShow)) {
+		if (isHorizontal) {
 			leftMargin = 400;
 		}
 
@@ -307,29 +392,6 @@ export const DistPlot = ({ data, countMap }) => {
 		renderChart(columnToShow);
 	}, [columnToShow, numOfBins, isHorizontal]);
 
-	const BinNumberSelector = (<VStack spacing='24px'>
-		<Slider aria-label='slider-ex-1' mt={50} defaultValue={10} min={5} max={20} size={'lg'} onChange={(val) => setNumOfBins(val)}>
-			<SliderMark
-				value={numOfBins}
-				textAlign='center'
-				bg='blue.500'
-				color='white'
-				mt='-10'
-				ml='-5'
-				w='12'
-			>
-				{numOfBins}
-			</SliderMark>
-			<SliderTrack>
-				<SliderFilledTrack />
-			</SliderTrack>
-			<SliderThumb />
-		</Slider>
-		<Box>
-			Number of bins = {numOfBins}
-		</Box>
-	</VStack>);
-
 	return <Box>
 		<HStack>
 			<FormControl display={"flex"} alignItems='center' justifyContent="space-between">
@@ -339,12 +401,32 @@ export const DistPlot = ({ data, countMap }) => {
 				<FormLabel marginLeft={"auto"} htmlFor='toggle-axis' mb='0'>
 					Toggle Orientation
 				</FormLabel>
-				<Switch colorScheme='teal' size='lg' id='toggle-axis' value={isHorizontal} onChange={(e) => setIsHorizontal(e.target.checked)} />
+				<Switch colorScheme='messenger' size='lg' id='toggle-axis' value={isHorizontal} onChange={(e) => setIsHorizontal(e.target.checked)} />
 			</FormControl>
 		</HStack>
-		<Box padding={2}>
-			{/* {columnToShow && COLUMN_MAPPING[columnToShow] == COLUMN_TYPE.NUMERIC && BinNumberSelector} */}
+		<Box padding={2} className="wrapper">
 			<div id="dist_plot" />
+			{columnToShow && (
+				<div className="legend-container">
+					<Popover placement="bottom-start">
+						<PopoverTrigger>
+							<Button colorScheme={"messenger"}>Legend</Button>
+						</PopoverTrigger>
+						<PopoverContent>
+							<PopoverHeader fontWeight='semibold'>{columnToShow}</PopoverHeader>
+							<PopoverCloseButton />
+							<PopoverBody>
+								<Badge variant='subtle' colorScheme={COLUMN_MAPPING[columnToShow] == COLUMN_TYPE.CATEGORICAL ? 'green' : 'purple'}>
+									{COLUMN_MAPPING[columnToShow] == COLUMN_TYPE.CATEGORICAL ? 'Categorical' : 'Numeric'}
+								</Badge>
+								<div><b>Detail:</b> {LEGEND_CONFIG[columnToShow]?.INFO}</div>
+								{LEGEND_CONFIG[columnToShow]?.UNIT && <div><b>Unit:</b> {LEGEND_CONFIG[columnToShow]?.UNIT}</div>}
+								{LEGEND_CONFIG[columnToShow]?.TABLE?.map((data, ind) => <div key={ind}><b>{data.key}</b>: {data.val}</div>)}
+							</PopoverBody>
+						</PopoverContent>
+					</Popover>
+				</div>
+			)}
 		</Box>
 	</Box>
 };

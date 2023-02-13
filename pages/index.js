@@ -13,17 +13,27 @@ export default function Home({ data, countMap }) {
 				<title>Visualization</title>
 			</Head>
 			<style jsx global>{`
+				* {
+					font-family: "Inter";
+				}
 				.plot-container {
 					margin-left: auto;
 					margin-right: auto;
 				}
+				.wrapper {
+					position: relative;
+				}
+				.legend-container {
+					position: absolute;
+					right: 10px;
+					top: 25px;
+				}
 			`}</style>
 			<main>
-				<Box margin='2' padding='2' color='black'>
-					<Center><Heading size={"sm"}>Data Visualization</Heading></Center>
-					<Divider mt="5" />
-					<Tabs isFitted variant='soft-rounded'>
+				<Box margin='2' color='black'>
+					<Tabs isFitted variant="enclosed-colored">
 						<TabList>
+							<Box width={"20%"}><Heading size={"lg"}>Data Visualization</Heading></Box>
 							<Tab>Distribution Plot / Histogram</Tab>
 							<Tab>Scatter Plot</Tab>
 						</TabList>
