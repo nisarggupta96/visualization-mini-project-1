@@ -26,6 +26,7 @@ export const DistPlot = ({ data, countMap }) => {
 	const [numOfBins, setNumOfBins] = useState(10);
 	const [isHorizontal, setIsHorizontal] = useState(false);
 
+	const isNumeric = columnToShow && [COLUMN_TYPE.NUMERIC, COLUMN_TYPE.NUMERIC_II].includes(COLUMN_MAPPING[columnToShow]);
 	const { MARGIN, DEFAULT_HEIGHT, DEFAULT_WIDTH } = DISTPLOT_CONFIG;
 
 	const renderHistogram = (svg, selectedColumn) => {
@@ -408,7 +409,7 @@ export const DistPlot = ({ data, countMap }) => {
 			</FormControl>
 		</HStack>
 		<Box padding={2} className="wrapper">
-			{columnToShow &&<Center><Heading mt={"10px"} size={"md"}>Distribution plot for: <Text color={"red"} as='samp'>{columnToShow}</Text></Heading></Center>}
+			{columnToShow &&<Center><Heading mt={"10px"} size={"md"}>{isNumeric ? "Histogram" : "Bar Chart"} for: <Text color={"red"} as='samp'>{columnToShow}</Text></Heading></Center>}
 			<div id="dist_plot" />
 			{columnToShow && (
 				<div className="legend-container">

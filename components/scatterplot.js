@@ -77,7 +77,7 @@ export const ScatterPlot = ({ data, countMap }) => {
 		if (COLUMN_MAPPING[columnX] == COLUMN_TYPE.CATEGORICAL) {
 			x = d3.scaleBand()
 				.domain(data.map(d => d[columnX]))
-				.range([0, 850])
+				.range([0, 600])
 				.padding(1);
 		} else {
 			x = d3.scaleLinear()
@@ -86,8 +86,8 @@ export const ScatterPlot = ({ data, countMap }) => {
 		}
 
 		const xAxis = svg.append("g")
-			.attr("transform", `translate(0, ${850})`)
-			.call(d3.axisBottom(x).tickSize(-850).ticks());
+			.attr("transform", `translate(0, ${600})`)
+			.call(d3.axisBottom(x).tickSize(-600).ticks());
 		xAxis.select(".domain").remove();
 		xAxis.selectAll("text")
 				.attr("transform", "translate(-10,0)rotate(-45)")
@@ -97,8 +97,8 @@ export const ScatterPlot = ({ data, countMap }) => {
 		svg.append("text")
 			.attr("class", "x label")
 			.attr("text-anchor", "end")
-			.attr("x", DEFAULT_WIDTH / 2 + columnX.length)
-			.attr("y", 1000)
+			.attr("x", DEFAULT_WIDTH/2 + columnX.length)
+			.attr("y", 750)
 			.text(columnX)
 			.style("font-size", "18px")
 			.style("font-weight", 600);
@@ -107,12 +107,12 @@ export const ScatterPlot = ({ data, countMap }) => {
 		if (COLUMN_MAPPING[columnY] == COLUMN_TYPE.CATEGORICAL) {
 			y = d3.scaleBand()
 				.domain(data.map(d => d[columnY]))
-				.range([850, 0])
+				.range([600, 0])
 				.padding(1);
 		} else {
 			y = d3.scaleLinear()
 				.domain([0, maxValueY])
-				.range([850, 0]);
+				.range([600, 0]);
 		}
 
 		const yAxis = svg.append("g")
@@ -165,7 +165,7 @@ export const ScatterPlot = ({ data, countMap }) => {
 
 	return <Box>
 		<HStack>
-			<RadioGroup name="axis-selection" defaultValue={axis} onChange={(val) => selectAxis(val)}>
+			<RadioGroup name="axis-selection" value={axis} onChange={(val) => selectAxis(val)}>
 				<Radio colorScheme='yellow' size={"lg"} value='X'>X Axis</Radio>
 				<Radio colorScheme='green' size={"lg"} value='Y'>Y Axis</Radio>
 			</RadioGroup>
