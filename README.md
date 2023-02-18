@@ -21,3 +21,6 @@ This 2023 car manufacturing dataset features columns that provide in-depth infor
 - Clone the repo and run `npm install` from terminal
 - To start the server, run `npm run dev` from terminal
 - Open localhost:3000 on local browser
+
+### Demo
+- https://visualization-mini-project-1.vercel.app/
